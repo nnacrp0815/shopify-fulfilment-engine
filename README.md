@@ -25,13 +25,21 @@ No Shopify account, token, tunnel or `.env` is required. The demo starts an ephe
 duplicate suppressed
 ```
 
-For the interactive operations viewer:
+### Client-friendly interactive preview
+
+Download [`demo.html`](demo.html) and open it in a browser. This is a self-contained file with its styling, scripts and six fictional sample orders included. There is no installation, account or server requirement. It runs the same routing function as the backend; it does not simulate having received real webhooks or written to the database. Preview changes reset when the page reloads.
+
+The dashboard includes status filters, product/order search, a selected-order explanation and a guided **Try a scenario** picker. Implementation details sit under **Behind the decision**, so a client can explore without reading event payloads.
+
+For the connected operations viewer:
 
 ```sh
 npm start
 ```
 
-Open [localhost:3000](http://127.0.0.1:3000). Click **Split shipment**, **Local pickup**, **Unknown product**, **Unpaid order**, **Digital goods**, or **Cancellation**. Inspect reasons, webhook attempts and proposed work. Demo mode binds only to the loopback interface. The viewer retains its fictional history in `data/engine.sqlite`; the command-line demo uses and removes a separate temporary database.
+Open [localhost:3000](http://127.0.0.1:3000). The page starts in the interactive preview. Choose **Connect to local engine** in the footer, then **Try a scenario** to send a signed fictional order through the real durable queue. The badge distinguishes the preview from the connected engine. Service mode requests its access token before showing operational data. Demo mode binds only to the loopback interface. Connected demo history stays in `data/engine.sqlite`; the command-line demo uses and removes a separate temporary database.
+
+The directory version at `public/index.html` also uses relative asset paths. `npm run build` regenerates the shared preview bundle and the portable `demo.html` from the current source. Commit both generated artifacts with source changes.
 
 <details>
 <summary>Preview the verified operations demo</summary>

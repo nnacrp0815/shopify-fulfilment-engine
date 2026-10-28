@@ -3,97 +3,386 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Fulfilment Engine · Operations demo</title>
-    <link rel="stylesheet" href="/style.css" />
-    <script src="/app.js" defer></script>
+    <meta
+      name="description"
+      content="Try sample Shopify orders, see why they route or need review, and inspect the next steps."
+    />
+    <title>Fulfilment Engine · Interactive demo</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script src="./preview.js" defer></script>
+    <script src="./app.js" defer></script>
   </head>
   <body>
-    <header>
-      <a href="/" class="brand"
-        ><span class="brand-icon">F</span> FULFILMENT ENGINE</a
-      ><span class="badge" id="mode">LOCAL DEMO</span>
-    </header>
-    <main>
-      <section class="intro">
-        <p class="eyebrow">SHOPIFY AUTOMATION / PORTFOLIO PROJECT 01</p>
-        <h1>Every order.<br />A clear next step.</h1>
-        <p class="lede">
-          Signed events become explainable routing decisions. Try a fictional
-          order, follow its rules, and inspect the proposed work.
-        </p>
-        <p class="notice">
-          Proposal mode · No shipments, emails or store changes are made.
-        </p>
-      </section>
-      <section class="controls" aria-labelledby="try-title">
-        <div>
-          <p class="eyebrow">01 / SIMULATE</p>
-          <h2 id="try-title">Send a sample order</h2>
-          <p>
-            Each scenario goes through signature verification and the durable
-            queue.
-          </p>
+    <a class="skip-link" href="#workspace">Skip to orders</a>
+    <svg
+      class="icon-library"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <symbol id="i-box" viewBox="0 0 24 24">
+        <path
+          d="m12 3 9 5-9 5-9-5 9-5Z M3 8v9l9 5 9-5V8 M12 13v9 M7.5 5.5l9 5"
+        />
+      </symbol>
+      <symbol id="i-grid" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="7" height="7" rx="2" />
+        <rect x="14" y="3" width="7" height="7" rx="2" />
+        <rect x="3" y="14" width="7" height="7" rx="2" />
+        <rect x="14" y="14" width="7" height="7" rx="2" />
+      </symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24">
+        <path d="M4 12h16m-6-6 6 6-6 6" />
+      </symbol>
+      <symbol id="i-chevron" viewBox="0 0 24 24">
+        <path d="m9 5 7 7-7 7" />
+      </symbol>
+      <symbol id="i-check" viewBox="0 0 24 24">
+        <path d="m5 12 4 4L19 6" />
+      </symbol>
+      <symbol id="i-alert" viewBox="0 0 24 24">
+        <path
+          d="m10.3 3.7-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3.3l-8-14a2 2 0 0 0-3.4 0Z M12 9v4 M12 17h.01"
+        />
+      </symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24">
+        <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z" />
+        <circle cx="12" cy="10" r="2.5" />
+      </symbol>
+      <symbol id="i-digital" viewBox="0 0 24 24">
+        <path d="M6 3h8l4 4v14H6V3Z M14 3v5h4 M12 11v6m-3-3 3 3 3-3" />
+      </symbol>
+      <symbol id="i-truck" viewBox="0 0 24 24">
+        <path d="M2 5h12v12H2V5Z M14 9h4l4 5v3h-8" />
+        <circle cx="6" cy="18" r="2" />
+        <circle cx="18" cy="18" r="2" />
+      </symbol>
+      <symbol id="i-search" viewBox="0 0 24 24">
+        <circle cx="10.5" cy="10.5" r="6.5" />
+        <path d="m16 16 5 5" />
+      </symbol>
+      <symbol id="i-play" viewBox="0 0 24 24">
+        <path d="m8 4 12 8-12 8V4Z" />
+      </symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24">
+        <path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Z m-4 9 3 3 5-5" />
+      </symbol>
+      <symbol id="i-code" viewBox="0 0 24 24">
+        <path d="m7 7-5 5 5 5 M17 7l5 5-5 5 M14 4l-4 16" />
+      </symbol>
+      <symbol id="i-close" viewBox="0 0 24 24">
+        <path d="m6 6 12 12 M18 6 6 18" />
+      </symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24">
+        <path
+          d="M20 7v5h-5 M4 17v-5h5 M5.5 7a7.5 7.5 0 0 1 13-1L20 9 M4 15l1.5 3a7.5 7.5 0 0 0 13-1"
+        />
+      </symbol>
+      <symbol id="i-stop" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" />
+        <path d="m6 6 12 12" />
+      </symbol>
+    </svg>
+    <aside class="sidebar" aria-label="Workspace navigation">
+      <a class="brand" href="./index.html"
+        ><span class="brand-mark"
+          ><svg><use href="#i-box" /></svg></span
+        ><span>fulfilment<span class="brand-sub">ENGINE</span></span></a
+      >
+      <div class="workspace-label">PORTFOLIO WORKSPACE</div>
+      <nav>
+        <a class="nav-item active" href="#workspace" aria-current="page"
+          ><svg><use href="#i-grid" /></svg>Order overview<span
+            class="nav-count"
+            id="nav-count"
+            >6</span
+          ></a
+        ><button class="nav-item" data-open="scenarios">
+          <svg><use href="#i-play" /></svg>Try a scenario</button
+        ><button class="nav-item" data-open="about">
+          <svg><use href="#i-shield" /></svg>How it works
+        </button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="sandbox-icon">
+          <svg><use href="#i-box" /></svg>
         </div>
-        <div class="scenarios" id="scenarios">
-          <button data-scenario="split-shipping">
-            Split shipment <span>Two warehouses →</span></button
-          ><button data-scenario="pickup">
-            Local pickup <span>Prepare for tomorrow →</span></button
-          ><button data-scenario="unknown-sku">
-            Unknown product <span>Hold for review →</span></button
-          ><button data-scenario="unpaid">
-            Unpaid order <span>Wait for payment →</span></button
-          ><button data-scenario="digital">
-            Digital goods <span>Digital queue →</span></button
-          ><button data-scenario="cancelled">
-            Cancellation <span>No fulfilment →</span>
+        <strong>A safe place to explore</strong>
+        <p>Fictional orders.<br />Real routing logic.</p>
+        <span class="sandbox-tag"><span></span>Demo workspace</span>
+      </div>
+      <a
+        class="source-link"
+        href="https://github.com/nnacrp0815/shopify-fulfilment-engine"
+        target="_blank"
+        rel="noreferrer"
+        ><svg><use href="#i-code" /></svg>View project on GitHub<svg>
+          <use href="#i-arrow" /></svg
+      ></a>
+    </aside>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="breadcrumbs">
+          Workspace <span>/</span> <strong>Order overview</strong>
+        </div>
+        <div class="topbar-actions">
+          <span class="mode-badge" id="mode"
+            ><span class="live-dot"></span>Interactive preview</span
+          ><button
+            class="icon-button"
+            data-open="about"
+            aria-label="About this demo"
+          >
+            ?
           </button>
         </div>
-      </section>
-      <form id="auth" hidden>
-        <label for="token">Service access token</label
-        ><input id="token" type="password" autocomplete="off" /><button
-          type="submit"
-        >
-          Connect
-        </button>
-        <p>Kept in memory for this page only.</p>
-      </form>
-      <p id="message" role="status" aria-live="polite">
-        Connecting to the local engine…
-      </p>
-      <section aria-labelledby="activity-title">
-        <div class="section-heading">
+      </header>
+      <main id="workspace">
+        <section class="page-heading">
           <div>
-            <p class="eyebrow">02 / INSPECT</p>
-            <h2 id="activity-title">Order decisions</h2>
+            <p class="eyebrow">LESS MANUAL WORK. MORE CLARITY.</p>
+            <h1>Your orders, under control.</h1>
+            <p class="page-description">
+              The right order. The right place. A clear next step for your team.
+            </p>
           </div>
-          <button id="refresh" class="quiet">Refresh</button>
+          <button class="button primary" data-open="scenarios">
+            <svg><use href="#i-play" /></svg>Try a scenario<svg>
+              <use href="#i-arrow" />
+            </svg>
+          </button>
+        </section>
+        <section class="welcome-banner" aria-label="Demo introduction">
+          <div class="welcome-icon">
+            <svg><use href="#i-box" /></svg>
+          </div>
+          <div>
+            <strong>Meet your next smoother workflow.</strong>
+            <p>
+              Explore six sample orders below, or try a scenario to see the
+              engine make a decision.
+            </p>
+          </div>
+          <span class="sample-label">SAMPLE DATA</span>
+        </section>
+        <section class="stats" aria-label="Order summary" id="stats"></section>
+        <div class="workspace-grid">
+          <section class="orders-panel" aria-labelledby="orders-title">
+            <div class="panel-heading">
+              <div>
+                <h2 id="orders-title">
+                  Order overview
+                  <span id="order-count" class="count-pill">6</span>
+                </h2>
+                <p>See what’s ready and what needs your attention.</p>
+              </div>
+              <button
+                id="refresh"
+                class="icon-button"
+                aria-label="Refresh orders"
+              >
+                <svg><use href="#i-refresh" /></svg>
+              </button>
+            </div>
+            <div class="list-toolbar">
+              <div class="filters" role="group" aria-label="Filter orders">
+                <button data-filter="all" aria-pressed="true">All orders</button
+                ><button data-filter="routed" aria-pressed="false">Ready</button
+                ><button data-filter="held" aria-pressed="false">
+                  Needs review</button
+                ><button data-filter="ignored" aria-pressed="false">
+                  No action
+                </button>
+              </div>
+              <label class="search"
+                ><svg><use href="#i-search" /></svg
+                ><span class="sr-only">Search orders or products</span
+                ><input
+                  id="search"
+                  type="search"
+                  placeholder="Search orders…"
+                  autocomplete="off"
+              /></label>
+            </div>
+            <div class="table-labels" aria-hidden="true">
+              <span>ORDER / ITEMS</span><span>DELIVERY</span><span>STATUS</span
+              ><span></span>
+            </div>
+            <div id="orders" class="orders" aria-label="Orders"></div>
+            <div class="list-footer">
+              <span id="list-summary">Showing 6 sample orders</span
+              ><span
+                ><span class="mini-dot"></span>Every decision explained</span
+              >
+            </div>
+          </section>
+          <aside
+            class="detail-panel"
+            id="order-detail"
+            aria-label="Selected order details"
+            aria-live="polite"
+          ></aside>
         </div>
-        <div class="stats" id="stats"></div>
-        <div id="orders" class="orders">
-          <p class="empty">No decisions yet. Send a sample order above.</p>
-        </div>
-      </section>
-      <section class="details-grid">
-        <div>
-          <p class="eyebrow">03 / AUDIT</p>
-          <h2>Webhook inbox</h2>
-          <div id="deliveries"></div>
-        </div>
-        <div>
-          <p class="eyebrow">04 / HAND OFF</p>
-          <h2>Proposed work</h2>
-          <p class="subtle">
-            Tasks stay local until a reviewed integration is added.
+        <section class="scenario-strip">
+          <div class="strip-icon">
+            <svg><use href="#i-play" /></svg>
+          </div>
+          <div>
+            <h2>What happens when an order isn’t straightforward?</h2>
+            <p>
+              Try a mixed cart, an unpaid order or an unfamiliar product. See
+              the next step.
+            </p>
+          </div>
+          <button class="button secondary" data-open="scenarios">
+            Explore scenarios<svg><use href="#i-arrow" /></svg>
+          </button>
+        </section>
+        <details class="technical-panel">
+          <summary>
+            <span
+              ><svg><use href="#i-code" /></svg>Behind the decision</span
+            ><span class="technical-hint"
+              >Activity &amp; implementation details<svg>
+                <use href="#i-chevron" /></svg
+            ></span>
+          </summary>
+          <p id="processing-note">
+            This browser preview runs the shared routing rules on fictional
+            orders. Webhook delivery and database persistence are available in
+            the connected engine.
           </p>
-          <div id="outbox"></div>
+          <div class="audit-grid">
+            <section>
+              <h3 id="activity-heading">Preview activity</h3>
+              <div id="deliveries"></div>
+            </section>
+            <section>
+              <h3>Proposed tasks</h3>
+              <div id="outbox"></div>
+            </section>
+          </div>
+        </details>
+        <footer>
+          <span
+            ><svg><use href="#i-shield" /></svg>Demo only. No shipments or store
+            changes.</span
+          ><button id="connect-engine" class="text-button">
+            Connect to local engine<svg><use href="#i-arrow" /></svg>
+          </button>
+        </footer>
+        <p
+          id="message"
+          class="toast"
+          role="status"
+          aria-live="polite"
+          hidden
+        ></p>
+        <noscript
+          ><p class="noscript">
+            Enable JavaScript to try the interactive demo.
+          </p></noscript
+        >
+      </main>
+    </div>
+    <dialog id="scenario-dialog" aria-labelledby="scenario-title">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">TRY IT FOR YOURSELF</p>
+          <h2 id="scenario-title">Start with an order.</h2>
         </div>
-      </section>
-      <footer>
-        TypeScript · SQLite · Shopify-compatible webhooks
-        <span>Fictional data. Real processing paths.</span>
-      </footer>
-    </main>
+        <button class="icon-button close-dialog" aria-label="Close scenarios">
+          <svg><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <p class="dialog-intro">
+        Choose a sample. We’ll show you where it goes, why, and what happens
+        next.
+      </p>
+      <div class="scenario-options" id="scenarios"></div>
+      <p class="dialog-footnote">
+        <svg><use href="#i-shield" /></svg>Fictional data. Nothing is sent to
+        Shopify.
+      </p>
+    </dialog>
+    <dialog id="about-dialog" aria-labelledby="about-title">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">A LITTLE LESS GUESSWORK</p>
+          <h2 id="about-title">From order to next step.</h2>
+        </div>
+        <button class="icon-button close-dialog" aria-label="Close explanation">
+          <svg><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <p class="dialog-intro">
+        An order should arrive with a plan. Here’s how the engine builds one.
+      </p>
+      <ol class="explanation-steps">
+        <li>
+          <span>1</span>
+          <div>
+            <h3>Check the essentials</h3>
+            <p>
+              Payment, products, delivery details and order limits are checked
+              against clear rules.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span>2</span>
+          <div>
+            <h3>Find the right destination</h3>
+            <p>
+              Shipping orders are matched to warehouses. Pickup and digital
+              items get their own next steps.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span>3</span>
+          <div>
+            <h3>Explain the decision</h3>
+            <p>
+              Your team sees a route, a reason to review, or confirmation that
+              no action is needed.
+            </p>
+          </div>
+        </li>
+      </ol>
+      <div class="about-note">
+        <strong>What you’re trying</strong>
+        <p>
+          This preview runs the same routing function as the backend. The
+          connected engine also verifies signed webhooks, stores work durably
+          and handles retries. Tasks remain proposals in both modes.
+        </p>
+      </div>
+      <a
+        class="button secondary"
+        href="https://github.com/nnacrp0815/shopify-fulfilment-engine"
+        target="_blank"
+        rel="noreferrer"
+        >Explore the code &amp; documentation<svg><use href="#i-arrow" /></svg
+      ></a>
+    </dialog>
+    <dialog id="auth-dialog" aria-labelledby="auth-title">
+      <div class="dialog-heading">
+        <h2 id="auth-title">Connect to your engine</h2>
+        <button class="icon-button close-dialog" aria-label="Close connection">
+          <svg><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <form id="auth">
+        <p class="dialog-intro">
+          Enter your service access token to view the connected engine’s orders.
+        </p>
+        <label for="token">Access token</label
+        ><input id="token" type="password" autocomplete="off" required />
+        <p class="field-help">Kept in memory for this page only.</p>
+        <button class="button primary" type="submit">
+          Connect securely<svg><use href="#i-arrow" /></svg>
+        </button>
+      </form>
+    </dialog>
   </body>
 </html>

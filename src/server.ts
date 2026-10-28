@@ -104,6 +104,8 @@ export function createApp(options: AppOptions) {
   const publicFiles = new Map([
     ["/", ["public/index.html", "text/html"]],
     ["/app.js", ["public/app.js", "text/javascript"]],
+    ["/index.html", ["public/index.html", "text/html"]],
+    ["/preview.js", ["public/preview.js", "text/javascript"]],
     ["/style.css", ["public/style.css", "text/css"]],
   ]);
   return createServer(async (req, res) => {

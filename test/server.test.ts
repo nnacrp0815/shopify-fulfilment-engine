@@ -196,7 +196,13 @@ test("service API requires bearer token and disables demo writes", async () =>
 test("health and viewer assets respond with security headers; arbitrary paths do not", async () =>
   withServer(async (url) => {
     assert.equal((await fetch(`${url}/healthz`)).status, 200);
-    for (const path of ["/", "/app.js", "/style.css"]) {
+    for (const path of [
+      "/",
+      "/index.html",
+      "/app.js",
+      "/preview.js",
+      "/style.css",
+    ]) {
       const response = await fetch(url + path);
       assert.equal(response.status, 200);
       assert.match(
