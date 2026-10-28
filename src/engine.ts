@@ -1,0 +1,140 @@
+import type { Decision, Order, Rules, Task } from "./model.js";
+
+function localDate(now: Date, timeZone: string): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+  const get = (type: string) => parts.find((p) => p.type === type)!.value;
+  return `${get("year")}-${get("month")}-${get("day")}`;
+}
+function validDate(value: string | null): value is string {
+  return Boolean(
+    value &&
+    /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    !Number.isNaN(Date.parse(value)) &&
+    new Date(value).toISOString().slice(0, 10) === value,
+  );
+}
+
+/** Pure decision function. Stock is an advisory snapshot, never an inventory reservation. */
+export function routeOrder(
+  order: Order,
+  rules: Rules,
+  now = new Date(),
+): Decision {
+  const result = (
+    status: Decision["status"],
+    reasons: string[],
+    tasks: Task[] = [],
+  ): Decision => ({ status, reasons, tasks, rulesVersion: rules.version });
+  if (order.cancelled) return result("ignored", ["ORDER_CANCELLED"]);
+  if (order.fulfilled || order.lines.every((l) => l.quantity === 0))
+    return result("ignored", ["NOTHING_TO_FULFIL"]);
+  const errors: string[] = [];
+  const lines = order.lines.filter((l) => l.quantity > 0);
+  if (order.financialStatus !== "paid") errors.push("PAYMENT_NOT_PAID");
+  if (order.currency !== rules.currency) errors.push("CURRENCY_NOT_SUPPORTED");
+  if (order.subtotalCents < rules.minimumSubtotalCents)
+    errors.push("BELOW_MINIMUM_SUBTOTAL");
+  if (lines.reduce((n, l) => n + l.quantity, 0) > rules.maxOrderUnits)
+    errors.push("ORDER_UNIT_LIMIT");
+  if (!["shipping", "pickup"].includes(order.method))
+    errors.push("UNKNOWN_DELIVERY_METHOD");
+  for (const l of lines) {
+    const item = Object.hasOwn(rules.catalog, l.sku)
+      ? rules.catalog[l.sku]
+      : undefined;
+    if (!item) {
+      errors.push(`UNKNOWN_SKU:${l.sku || "MISSING"}`);
+      continue;
+    }
+    if ((item.kind === "digital") === l.requiresShipping)
+      errors.push(`SHIPPING_FLAG_MISMATCH:${l.sku}`);
+    if (item.kind === "pickup-only" && order.method !== "pickup")
+      errors.push("PICKUP_ITEM_CANNOT_SHIP");
+  }
+  const physical = lines.filter(
+    (l) => rules.catalog[l.sku]?.kind !== "digital",
+  );
+  const digital = lines.filter((l) => rules.catalog[l.sku]?.kind === "digital");
+  if (
+    physical.length &&
+    order.method === "shipping" &&
+    (!order.country || !rules.allowedCountries.includes(order.country))
+  )
+    errors.push("DESTINATION_NOT_SUPPORTED");
+  if (physical.length && order.method === "pickup") {
+    if (
+      !order.pickupLocation ||
+      !rules.pickupLocations.includes(order.pickupLocation)
+    )
+      errors.push("INVALID_PICKUP_LOCATION");
+    if (
+      !validDate(order.pickupDate) ||
+      order.pickupDate < localDate(now, rules.timezone)
+    )
+      errors.push("INVALID_PICKUP_DATE");
+  }
+  if (errors.length) return result("held", [...new Set(errors)]);
+  const tasks: Task[] = [];
+  if (digital.length)
+    tasks.push({
+      type: "digital-delivery",
+      destination: "digital-queue",
+      lines: digital.map(({ id, sku, quantity }) => ({ id, sku, quantity })),
+    });
+  if (!physical.length) return result("routed", ["DIGITAL_ONLY"], tasks);
+  const warehouses = [...rules.warehouses]
+    .filter((w) =>
+      order.method === "pickup"
+        ? w.id === order.pickupLocation
+        : w.countries.includes(order.country!),
+    )
+    .sort((a, b) => a.priority - b.priority || a.id.localeCompare(b.id));
+  const needed = new Map<string, number>();
+  for (const l of physical)
+    needed.set(l.sku, (needed.get(l.sku) ?? 0) + l.quantity);
+  const whole = warehouses.find((w) =>
+    [...needed].every(([sku, qty]) => (w.stock[sku] ?? 0) >= qty),
+  );
+  if (!whole && (order.method === "pickup" || !rules.allowSplitShipping))
+    return result("held", ["NO_SINGLE_LOCATION_STOCK"]);
+  const remaining = new Map(warehouses.map((w) => [w.id, { ...w.stock }]));
+  for (const l of physical) {
+    let quantity = l.quantity;
+    for (const w of whole ? [whole] : warehouses) {
+      const stock = remaining.get(w.id)!;
+      const take = Math.min(quantity, stock[l.sku] ?? 0);
+      if (!take) continue;
+      let task = tasks.find((t) => t.destination === w.id);
+      if (!task) {
+        task = {
+          type: order.method === "pickup" ? "prepare-pickup" : "warehouse-pick",
+          destination: w.id,
+          lines: [],
+        };
+        tasks.push(task);
+      }
+      task.lines.push({ id: l.id, sku: l.sku, quantity: take });
+      stock[l.sku] = (stock[l.sku] ?? 0) - take;
+      quantity -= take;
+      if (quantity === 0) break;
+    }
+    if (quantity > 0) return result("held", ["INSUFFICIENT_STOCK"]);
+  }
+  return result(
+    "routed",
+    [
+      order.method === "pickup"
+        ? "PICKUP_READY_TO_PLAN"
+        : "SHIPPING_READY_TO_PLAN",
+      ...(tasks.filter((t) => t.type === "warehouse-pick").length > 1
+        ? ["SPLIT_SHIPMENT"]
+        : []),
+    ],
+    tasks,
+  );
+}

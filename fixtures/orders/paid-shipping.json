@@ -1,0 +1,27 @@
+{
+  "id": 1001,
+  "updated_at": "2026-10-28T02:00:00Z",
+  "financial_status": "paid",
+  "cancelled_at": null,
+  "fulfillment_status": null,
+  "currency": "AUD",
+  "current_subtotal_price": "85.00",
+  "shipping_address": { "country_code": "AU" },
+  "note_attributes": [],
+  "line_items": [
+    {
+      "id": 101,
+      "sku": "TEE-BLACK",
+      "quantity": 2,
+      "fulfillable_quantity": 2,
+      "requires_shipping": true
+    },
+    {
+      "id": 102,
+      "sku": "SAUCE-01",
+      "quantity": 1,
+      "fulfillable_quantity": 1,
+      "requires_shipping": true
+    }
+  ]
+}

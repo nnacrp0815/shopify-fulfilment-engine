@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fulfilment Engine · Operations demo</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <a href="/" class="brand"
+        ><span class="brand-icon">F</span> FULFILMENT ENGINE</a
+      ><span class="badge" id="mode">LOCAL DEMO</span>
+    </header>
+    <main>
+      <section class="intro">
+        <p class="eyebrow">SHOPIFY AUTOMATION / PORTFOLIO PROJECT 01</p>
+        <h1>Every order.<br />A clear next step.</h1>
+        <p class="lede">
+          Signed events become explainable routing decisions. Try a fictional
+          order, follow its rules, and inspect the proposed work.
+        </p>
+        <p class="notice">
+          Proposal mode · No shipments, emails or store changes are made.
+        </p>
+      </section>
+      <section class="controls" aria-labelledby="try-title">
+        <div>
+          <p class="eyebrow">01 / SIMULATE</p>
+          <h2 id="try-title">Send a sample order</h2>
+          <p>
+            Each scenario goes through signature verification and the durable
+            queue.
+          </p>
+        </div>
+        <div class="scenarios" id="scenarios">
+          <button data-scenario="split-shipping">
+            Split shipment <span>Two warehouses →</span></button
+          ><button data-scenario="pickup">
+            Local pickup <span>Prepare for tomorrow →</span></button
+          ><button data-scenario="unknown-sku">
+            Unknown product <span>Hold for review →</span></button
+          ><button data-scenario="unpaid">
+            Unpaid order <span>Wait for payment →</span></button
+          ><button data-scenario="digital">
+            Digital goods <span>Digital queue →</span></button
+          ><button data-scenario="cancelled">
+            Cancellation <span>No fulfilment →</span>
+          </button>
+        </div>
+      </section>
+      <form id="auth" hidden>
+        <label for="token">Service access token</label
+        ><input id="token" type="password" autocomplete="off" /><button
+          type="submit"
+        >
+          Connect
+        </button>
+        <p>Kept in memory for this page only.</p>
+      </form>
+      <p id="message" role="status" aria-live="polite">
+        Connecting to the local engine…
+      </p>
+      <section aria-labelledby="activity-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">02 / INSPECT</p>
+            <h2 id="activity-title">Order decisions</h2>
+          </div>
+          <button id="refresh" class="quiet">Refresh</button>
+        </div>
+        <div class="stats" id="stats"></div>
+        <div id="orders" class="orders">
+          <p class="empty">No decisions yet. Send a sample order above.</p>
+        </div>
+      </section>
+      <section class="details-grid">
+        <div>
+          <p class="eyebrow">03 / AUDIT</p>
+          <h2>Webhook inbox</h2>
+          <div id="deliveries"></div>
+        </div>
+        <div>
+          <p class="eyebrow">04 / HAND OFF</p>
+          <h2>Proposed work</h2>
+          <p class="subtle">
+            Tasks stay local until a reviewed integration is added.
+          </p>
+          <div id="outbox"></div>
+        </div>
+      </section>
+      <footer>
+        TypeScript · SQLite · Shopify-compatible webhooks
+        <span>Fictional data. Real processing paths.</span>
+      </footer>
+    </main>
+  </body>
+</html>

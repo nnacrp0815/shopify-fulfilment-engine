@@ -1,0 +1,29 @@
+{
+  "name": "shopify-fulfilment-engine",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Durable Shopify webhook intake, explainable fulfilment routing and an offline operations demo.",
+  "type": "module",
+  "engines": {
+    "node": ">=24.14.0 <25"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test --experimental-test-coverage dist/test/*.test.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run test",
+    "demo": "npm run build && node dist/src/demo.js",
+    "start": "npm run build && node --env-file-if-exists=.env dist/src/main.js"
+  },
+  "dependencies": {
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "prettier": "3.9.10",
+    "typescript": "7.0.2"
+  },
+  "license": "MIT"
+}

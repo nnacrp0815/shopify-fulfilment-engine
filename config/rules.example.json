@@ -1,0 +1,30 @@
+{
+  "version": "portfolio-1",
+  "currency": "AUD",
+  "timezone": "Australia/Perth",
+  "allowedCountries": ["AU"],
+  "minimumSubtotalCents": 3000,
+  "maxOrderUnits": 100,
+  "allowSplitShipping": true,
+  "pickupLocations": ["studio"],
+  "catalog": {
+    "TEE-BLACK": { "kind": "shippable" },
+    "SAUCE-01": { "kind": "shippable" },
+    "CLASS-01": { "kind": "pickup-only" },
+    "GUIDE-PDF": { "kind": "digital" }
+  },
+  "warehouses": [
+    {
+      "id": "west-3pl",
+      "priority": 10,
+      "countries": ["AU"],
+      "stock": { "TEE-BLACK": 50 }
+    },
+    {
+      "id": "studio",
+      "priority": 20,
+      "countries": ["AU"],
+      "stock": { "SAUCE-01": 25, "CLASS-01": 20 }
+    }
+  ]
+}
